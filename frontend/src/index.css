@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --soc-bg: #0a0e1a;
+  --soc-panel: #0f1629;
+  --soc-card: #141d35;
+  --soc-border: #1e2d4f;
+  --soc-accent: #1e88e5;
+}
+
+body {
+  background-color: var(--soc-bg);
+  color: #e2e8f0;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0a0e1a; }
+::-webkit-scrollbar-thumb { background: #1e2d4f; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #1e88e5; }
+
+/* Glow effects */
+.glow-critical { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+.glow-high { box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
+.glow-accent { box-shadow: 0 0 20px rgba(30, 136, 229, 0.2); }
+
+/* Pulse animation for live indicator */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* Data grid */
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* Scan line animation for SOC aesthetic */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
