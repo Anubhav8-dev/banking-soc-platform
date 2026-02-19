@@ -1,11 +1,122 @@
-# 🏦 BankShield SOC — Banking-Grade Autonomous Cyber Incident Response Platform
+# 🏦 BankShield SOC  
+## Banking-Grade Autonomous Cyber Incident Response Platform  
+### Barclays Hackathon Submission
 
-A **fully offline**, **banking-grade** AI Security Operations Center that:
-- Reduces false positives via UEBA + fidelity scoring
-- Automates investigation with LangGraph agents
-- Generates RBI-compliant incident response playbooks
-- Preserves human authority (supervisor approval required)
-- Passes regulatory audit review (complete audit trail)
+---
+
+## 🎯 Executive Summary
+
+BankShield SOC is a fully offline, AI-driven cyber incident response platform designed for regulated financial institutions. It combines UEBA-based anomaly detection, MITRE ATT&CK mapping, explainable AI (SHAP), and autonomous agent orchestration to reduce alert fatigue while preserving human supervisory authority.
+
+The platform aligns with RBI cybersecurity guidelines and supports complete audit traceability for regulatory defensibility.
+
+---
+
+## 🚨 Problem Statement
+
+Modern banks face:
+
+- Alert fatigue from excessive false positives  
+- Increasing fraud and account takeover attacks  
+- Regulatory pressure for explainable AI  
+- Mandatory breach reporting timelines (CERT-In – 6 hours)  
+- Strict data residency and offline compliance requirements  
+
+Traditional SIEM systems generate alerts but lack contextual AI-driven triage with regulatory audit readiness.
+
+---
+
+## 🚀 Solution Overview
+
+BankShield SOC provides:
+
+- ✅ UEBA-based anomaly detection (tsfresh + PyOD)  
+- ✅ Fidelity scoring to reduce false positives  
+- ✅ MITRE ATT&CK technique mapping  
+- ✅ LangGraph multi-agent orchestration  
+- ✅ AI-generated incident playbooks (Ollama – llama3:instruct, local inference only)  
+- ✅ Mandatory supervisor approval workflow  
+- ✅ Complete Elasticsearch audit trail  
+- ✅ Fully offline operation (no cloud APIs)
+
+---
+
+## 🏦 Why This Matters for Barclays
+
+- Reduces SOC analyst overload via fidelity-based prioritization  
+- Preserves human-in-the-loop supervisory authority  
+- Enables explainable AI (SHAP) for regulatory defensibility  
+- Operates fully offline to satisfy data sovereignty constraints  
+- Provides audit-ready incident evidence for compliance review  
+
+---
+
+## 🏗 Architecture Overview
+
+## 📊 Architecture Diagram
+
+![Architecture](architecture.png)
+
+### High-Level Flow
+
+```
+React Frontend (Dashboard)
+        ↓
+FastAPI Backend (JWT + RBAC)
+        ↓
+LangGraph Agent Orchestration
+        ↓
+UEBA Engine (PyOD + tsfresh + SHAP)
+        ↓
+Elasticsearch (Logs + Audit Trail)
+        ↓
+Ollama (llama3:instruct – Local AI Inference)
+```
+
+---
+
+## 🔒 Offline Security Perimeter
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    OFFLINE PERIMETER                         │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
+│  │  React   │──▶│ FastAPI  │──▶│ LangGraph│──▶│  Ollama  │ │
+│  │  (Vite)  │   │  (JWT)   │   │  Agent   │   │ (Local)  │ │
+│  └──────────┘   └──────────┘   └──────────┘   └──────────┘ │
+│       │              │               │                       │
+│       │         ┌────▼────┐   ┌──────▼──────┐              │
+│       │         │  PyOD   │   │Elasticsearch│              │
+│       │         │  SHAP   │   │  (Logs +    │              │
+│       │         │ tsfresh │   │  Audit)     │              │
+│       └─────────└─────────┘   └─────────────┘              │
+│                                                             │
+│  ✗ No Internet  ✗ No Telemetry  ✗ No Cloud APIs            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📊 Fidelity Scoring Model
+
+```
+Fidelity = 0.4 × anomaly_score
+         + 0.2 × threat_intel_score
+         + 0.2 × correlation_strength
+         + 0.1 × mitre_severity
+         + 0.1 × historical_similarity
+```
+
+### Decision Thresholds
+
+| Fidelity Score | Action |
+|---------------|--------|
+| ≥ 0.90 | Critical Severity |
+| ≥ 0.75 | High Severity (Agent Triggered) |
+| ≥ 0.50 | Medium Severity |
+| < 0.50 | Low Severity |
+
+This significantly reduces false positives while prioritizing genuine risk.
 
 ---
 
@@ -14,54 +125,39 @@ A **fully offline**, **banking-grade** AI Security Operations Center that:
 ```
 banking-soc-platform/
 ├── backend/
-│   ├── main.py              # FastAPI app — all endpoints
-│   ├── ingest.py            # Elasticsearch log ingestion
-│   ├── analytics.py         # UEBA: tsfresh + PyOD + SHAP
-│   ├── agent_graph.py       # LangGraph orchestration (Triage→Dedup→Investigate→Respond)
-│   ├── tools_server.py      # FastMCP tools (SIEM, ThreatIntel, SOP, MITRE)
-│   ├── mitre_mapper.py      # Local MITRE ATT&CK mapping engine
-│   ├── dedup.py             # Alert deduplication (hash fingerprint)
-│   ├── audit_logger.py      # Mandatory audit trail → Elasticsearch
+│   ├── main.py
+│   ├── ingest.py
+│   ├── analytics.py
+│   ├── agent_graph.py
+│   ├── tools_server.py
+│   ├── mitre_mapper.py
+│   ├── dedup.py
+│   ├── audit_logger.py
 │   └── requirements.txt
 ├── frontend/
-│   ├── src/
-│   │   ├── App.tsx           # Router + Auth context
-│   │   ├── pages/
-│   │   │   ├── LoginPage.tsx           # JWT authentication
-│   │   │   ├── DashboardLayout.tsx     # Sidebar + header
-│   │   │   ├── AlertsPage.tsx          # Incident list + controls
-│   │   │   ├── IncidentDetailPage.tsx  # Split-screen detail + SHAP chart
-│   │   │   ├── AuditPage.tsx           # Audit trail viewer
-│   │   │   └── SettingsPage.tsx        # System status + RBAC
-│   │   └── utils/api.ts
-│   ├── package.json
-│   └── vite.config.ts
 ├── data/
-│   ├── threat_intel.json    # Local IP blacklist
-│   └── sample_logs.csv      # Test log data
-└── scripts/
-    └── test_platform.py     # Component test script
+├── scripts/
+└── README.md
 ```
 
 ---
 
-## 🚀 Setup Instructions
+## ⚙️ Setup Instructions
 
 ### Prerequisites
 
-| Component | Version | Purpose |
-|-----------|---------|---------|
-| Python | 3.10+ | Backend |
-| Node.js | 18+ | Frontend |
-| Elasticsearch | 8.x | Log storage + audit |
-| Ollama | Latest | Local LLM (llama3) |
-| Docker (optional) | Any | Easy ES setup |
+| Component | Version |
+|-----------|----------|
+| Python | 3.10+ |
+| Node.js | 18+ |
+| Elasticsearch | 8.x |
+| Ollama | Latest |
+| Docker (optional) | Any |
 
 ---
 
-### Step 1: Start Elasticsearch (Local, No Cloud)
+### 1️⃣ Start Elasticsearch
 
-**Option A — Docker:**
 ```bash
 docker run -d \
   --name elasticsearch \
@@ -72,190 +168,132 @@ docker run -d \
   elasticsearch:8.11.0
 ```
 
-**Option B — Download directly:**
-```bash
-# Download from elastic.co (no account required for local use)
-# Extract and run: ./bin/elasticsearch
-```
+Verify:
 
-Verify: `curl http://localhost:9200`
+```
+curl http://localhost:9200
+```
 
 ---
 
-### Step 2: Install and Start Ollama
+### 2️⃣ Install Ollama
 
 ```bash
-# Install Ollama (Linux/Mac)
-curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull llama3:instruct
+ollama run llama3:instruct
+```
 
-# Pull and run llama3 locally
-ollama pull llama3
-ollama run llama3
+Verify:
 
-# Verify
+```
 curl http://localhost:11434/api/tags
 ```
 
-> **Note:** The platform works without Ollama — falls back to rule-based responses automatically.
-
 ---
 
-### Step 3: Backend Setup
+### 3️⃣ Backend Setup
 
 ```bash
-cd banking-soc-platform/backend
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+cd backend
+py -3 -m venv venv
+venv\Scripts\activate
 pip install -r requirements.txt
-
-# Run component tests
-cd ../scripts
-python test_platform.py
-
-# Start the API server
-cd ../backend
-uvicorn main:app --reload --port 8000 --host 0.0.0.0
+uvicorn main:app --reload --port 8000
 ```
 
-API docs: `http://localhost:8000/api/docs`
+API Docs:
+
+```
+http://localhost:8000/docs
+```
 
 ---
 
-### Step 4: Frontend Setup
+### 4️⃣ Frontend Setup
 
 ```bash
-cd banking-soc-platform/frontend
-
-# Install dependencies
+cd frontend
 npm install
-
-# Start development server
 npm run dev
 ```
 
-App: `http://localhost:5173`
-
----
-
-### Step 5: First Run — Generate Data
-
-1. **Login** at `http://localhost:5173/login`
-   - `analyst1` / `analyst123` → Analyst role
-   - `supervisor1` / `supervisor123` → Supervisor role
-   - `auditor1` / `auditor123` → Auditor role
-
-2. **Generate test logs** — Click "Generate Test Logs" (creates 200 brute-force events tagged T1110)
-
-3. **Run analysis** — Click "Run UEBA Analysis" (triggers full pipeline)
-
-4. **Review incident** — Click on any generated incident to see the split-screen detail
-
-5. **Approve playbook** — Login as `supervisor1` and approve the AI-generated playbook
-
----
-
-## 🔒 Security Architecture
+Application:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    OFFLINE PERIMETER                         │
-│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
-│  │  React   │──▶│ FastAPI  │──▶│ LangGraph│──▶│  Ollama  │ │
-│  │  (Vite)  │   │  (JWT)   │   │  Agent   │   │ (llama3) │ │
-│  └──────────┘   └──────────┘   └──────────┘   └──────────┘ │
-│       │              │               │                       │
-│       │         ┌────▼────┐   ┌──────▼──────┐              │
-│       │         │  PyOD   │   │Elasticsearch│              │
-│       │         │  SHAP   │   │  (Logs +    │              │
-│       │         │ tsfresh │   │  Audit)     │              │
-│       └─────────└─────────┘   └─────────────┘              │
-│                                                             │
-│  ✗ No internet  ✗ No telemetry  ✗ No cloud APIs            │
-└─────────────────────────────────────────────────────────────┘
+http://localhost:5173
 ```
 
 ---
 
-## 📊 Fidelity Scoring Formula
-
-```
-Fidelity = 0.4 × anomaly_score
-          + 0.2 × threat_intel_score
-          + 0.2 × correlation_strength
-          + 0.1 × mitre_severity
-          + 0.1 × historical_similarity
-
-Fidelity ≥ 0.75  →  Agent triggered
-Fidelity ≥ 0.90  →  Critical severity
-Fidelity ≥ 0.75  →  High severity
-Fidelity ≥ 0.50  →  Medium severity
-Fidelity < 0.50  →  Low severity
-```
-
----
-
-## 🔐 RBAC Permissions
+## 🔐 RBAC Model
 
 | Endpoint | Analyst | Supervisor | Auditor |
 |----------|---------|------------|---------|
-| POST /login | ✓ | ✓ | ✓ |
-| GET /alerts | ✓ | ✓ | ✓ |
-| POST /ingest | ✓ | ✓ | ✗ |
-| POST /analyze | ✓ | ✓ | ✗ |
-| GET /incident/:id | ✓ | ✓ | ✓ |
-| POST /approve/:id | ✗ | ✓ | ✗ |
-| POST /reject/:id | ✓ | ✓ | ✗ |
-| GET /audit/:id | ✗ | ✓ | ✓ |
+| /login | ✓ | ✓ | ✓ |
+| /alerts | ✓ | ✓ | ✓ |
+| /analyze | ✓ | ✓ | ✗ |
+| /approve | ✗ | ✓ | ✗ |
+| /audit | ✗ | ✓ | ✓ |
+
+Supervisor approval is mandatory before automated playbook execution.
 
 ---
 
-## 🏛️ Regulatory Compliance
+## 🏛 Regulatory Alignment
 
-- **RBI Cybersecurity Framework for Banks** (2016)
-- **RBI Master Directions on NBFC-IT** (2017)
-- **CERT-In Notification Requirements** (6-hour breach reporting)
-- **IT Act Section 72A** (data breach notification)
-- **MITRE ATT&CK Framework** (technique classification)
-- **RBI AI Governance Principles** (explainable, auditable AI)
+- RBI Cybersecurity Framework for Banks (2016)
+- RBI Master Directions on NBFC-IT (2017)
+- CERT-In 6-hour incident reporting mandate
+- IT Act Section 72A
+- MITRE ATT&CK framework
+- AI Governance principles (Explainability + Auditability)
 
 ---
 
 ## 🧪 Testing
 
 ```bash
-# Run all component tests
-cd scripts && python test_platform.py
+cd scripts
+python test_platform.py
+```
 
-# Test specific endpoints (with server running)
-curl -X POST http://localhost:8000/login \
-  -d "username=analyst1&password=analyst123"
+Health check:
 
-# Health check
+```
 curl http://localhost:8000/health
 ```
 
 ---
 
-## ⚠️ Production Hardening Checklist
+## 🏆 Differentiation from Traditional SIEM
 
-- [ ] Replace `SECRET_KEY` in `main.py` with 32-byte random key
-- [ ] Replace in-memory `USERS_DB` with encrypted database
-- [ ] Enable Elasticsearch TLS (`xpack.security.enabled=true`)
-- [ ] Set up data-at-rest encryption for ES indices
-- [ ] Configure network firewall rules (block outbound by default)
-- [ ] Set up log rotation for Elasticsearch
-- [ ] Configure Ollama model access controls
-- [ ] Add rate limiting to API endpoints
-- [ ] Set up certificate-based auth for ES client
-- [ ] Enable audit log archival to WORM storage
+Traditional SIEM:
+- Generates alerts  
+- Requires manual investigation  
+
+BankShield SOC:
+- Generates contextual AI analysis  
+- Scores alert fidelity  
+- Maps to MITRE  
+- Produces explainable incident playbooks  
+- Enforces supervisory approval  
+- Operates fully offline  
 
 ---
 
-## 📞 Support
+## 🔐 Production Hardening Checklist
 
-This is a fully offline system. All components run locally.
-No data leaves the environment. No external support calls are made.
+- Replace SECRET_KEY with secure 32-byte random key  
+- Enable Elasticsearch TLS  
+- Configure encrypted data-at-rest  
+- Implement rate limiting  
+- Configure outbound firewall restrictions  
+- Enable WORM archival for audit logs  
+
+---
+
+## 📌 Conclusion
+
+BankShield SOC demonstrates how AI-driven automation, explainable analytics, and regulatory compliance can coexist within a fully offline, banking-grade incident response platform.
+
+It is designed specifically for high-regulation financial environments like Barclays.
